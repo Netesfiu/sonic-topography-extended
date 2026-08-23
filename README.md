@@ -18,10 +18,7 @@ It keeps the original visual concept while adding a stereo-aware audio engine, s
 - Stereo spatialization across the terrain
 - Multi-timescale spectral memory
 - Music-driven terrain coherence
-- Music-reactive colored lamp panels
-- Lamp positions re-seeded between musical events
-- Bass-heavy center exclusion for lamp accents
-- Resolution-aware lamp grouping with 120x120 as the visual reference
+- Music-reactive colored accent panels
 - Configurable accent trigger, density, brightness and color source
 - Meteors, idle waves, camera controls and media controls
 - English-only generated Wallpaper Engine settings
