@@ -9,8 +9,6 @@ https://github.com/CmzYa/sonic-topography
 
 It keeps the original visual concept while adding a stereo-aware audio engine, smoother temporal response, rhythm analysis, spectral memory, stereo spatialization, terrain coherence and music-reactive lamp panels.
 
-> This is a modified GPL-3.0 release and is not presented as an official release by the original author. See [`NOTICE.md`](NOTICE.md) and [`ACKNOWLEDGEMENTS.md`](ACKNOWLEDGEMENTS.md).
-
 ## Features
 
 - True 64-bin stereo-aware analysis from Wallpaper Engine's left/right spectrum channels
@@ -43,6 +41,19 @@ For local development/deployment, copy `.env.example` to `.env` and set the `WE`
 .\update.ps1
 ```
 
+## Automated builds and releases
+
+GitHub Actions builds the Wallpaper Engine package on pushes to `main`, pull requests, and manual workflow runs. The generated `dist-wallpaper/` directory is uploaded as a workflow artifact.
+
+To publish a GitHub Release automatically, create and push a version tag such as:
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+The workflow creates a ZIP containing the standalone Wallpaper Engine package and attaches it to the corresponding GitHub Release.
+
 ## Credits
 
 **Original project and visual concept:** CmzYa  
@@ -51,7 +62,9 @@ https://github.com/CmzYa/sonic-topography
 **Extended version:** Netesfiu  
 https://github.com/Netesfiu/sonic-topography-extended
 
-Detailed credits are in [`ACKNOWLEDGEMENTS.md`](ACKNOWLEDGEMENTS.md).
+See [`NOTICE.md`](NOTICE.md) and [`ACKNOWLEDGEMENTS.md`](ACKNOWLEDGEMENTS.md) for attribution and third-party acknowledgements.
+
+This repository contains a modified version of the original project and is not presented as an official release by the original author.
 
 ## Support
 
