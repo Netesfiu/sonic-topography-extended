@@ -1,0 +1,87 @@
+name: Build and release Wallpaper Engine package
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+  issues:
+    types:
+      - opened
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  build-release:
+    if: github.event_name != 'issues' || github.event.issue.title == 'build-release-v1'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Wallpaper Engine package
+        run: pnpm run build
+
+      - name: Verify build output
+        shell: bash
+        run: |
+          test -f dist-wallpaper/index.html
+          test -f dist-wallpaper/project.json
+          test -f dist-wallpaper/preview.gif
+
+      - name: Package release archive
+        shell: bash
+        run: |
+          cd dist-wallpaper
+          zip -r ../sonic-topography-extended-wallpaper.zip .
+          cd ..
+          sha256sum sonic-topography-extended-wallpaper.zip > sonic-topography-extended-wallpaper.zip.sha256
+
+      - name: Publish rolling latest release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          git tag -f latest "${GITHUB_SHA}"
+          git push origin refs/tags/latest --force
+
+          if gh release view latest >/dev/null 2>&1; then
+            gh release edit latest \
+              --title "Sonic Topography Extended - latest" \
+              --notes "Automated Wallpaper Engine build from main at ${GITHUB_SHA}."
+          else
+            gh release create latest \
+              --title "Sonic Topography Extended - latest" \
+              --notes "Automated Wallpaper Engine build from main at ${GITHUB_SHA}." \
+              --prerelease
+          fi
+
+          gh release upload latest \
+            sonic-topography-extended-wallpaper.zip \
+            sonic-topography-extended-wallpaper.zip.sha256 \
+            --clobber
+
+      - name: Close manual build issue
+        if: github.event_name == 'issues'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: gh issue close "${{ github.event.issue.number }}" --reason completed
