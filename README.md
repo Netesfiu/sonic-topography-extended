@@ -9,6 +9,8 @@ https://github.com/CmzYa/sonic-topography
 
 It keeps the original visual concept while adding a stereo-aware audio engine, smoother temporal response, rhythm analysis, spectral memory, stereo spatialization, terrain coherence and music-reactive lamp panels.
 
+> This is a modified GPL-3.0 release and is not presented as an official release by the original author. See [`NOTICE.md`](NOTICE.md) and [`ACKNOWLEDGEMENTS.md`](ACKNOWLEDGEMENTS.md).
+
 ## Features
 
 - True 64-bin stereo-aware analysis from Wallpaper Engine's left/right spectrum channels
@@ -49,7 +51,7 @@ https://github.com/CmzYa/sonic-topography
 **Extended version:** Netesfiu  
 https://github.com/Netesfiu/sonic-topography-extended
 
-This repository contains a modified version of the original project and is not presented as an official release by the original author.
+Detailed credits are in [`ACKNOWLEDGEMENTS.md`](ACKNOWLEDGEMENTS.md).
 
 ## Support
 
