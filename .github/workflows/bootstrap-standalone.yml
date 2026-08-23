@@ -1,14 +1,15 @@
 name: Bootstrap standalone repository
 
 on:
-  push:
-    branches: [main]
+  issues:
+    types: [opened]
 
 permissions:
   contents: write
 
 jobs:
   bootstrap:
+    if: github.event.issue.title == 'bootstrap-standalone-repository'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout target repository
@@ -29,7 +30,6 @@ jobs:
           cp -a /tmp/sonic-source/. .
           rm -rf .git
 
-          # Remove development/fork-only debris and obsolete wrappers.
           rm -rf .superpowers
           rm -f HANDOVER.md README_WALLPAPER.md CHANGELOG.md deploy-wallpaper.bat
           rm -f vite.wallpaper.adaptive.config.ts
@@ -39,26 +39,22 @@ jobs:
           from pathlib import Path
           import json
 
-          # Standalone updater follows main instead of the old feature branch.
           p = Path('update.ps1')
           s = p.read_text(encoding='utf-8')
           s = s.replace('$Branch = "enhanced-audio-v2"', '$Branch = "main"')
           p.write_text(s, encoding='utf-8')
 
-          # Standalone package metadata and deploy command.
           p = Path('package.json')
           data = json.loads(p.read_text(encoding='utf-8'))
           data['name'] = 'sonic-topography-extended'
           data['scripts']['deploy'] = 'powershell -ExecutionPolicy Bypass -File .\\update.ps1'
           p.write_text(json.dumps(data, indent=2) + '\n', encoding='utf-8')
 
-          # Local deployment example should use this project's name.
           p = Path('.env.example')
           s = p.read_text(encoding='utf-8')
           s = s.replace('sonic-topography-custom', 'sonic-topography-extended')
           p.write_text(s, encoding='utf-8')
 
-          # Never inherit the original author's Workshop identity.
           p = Path('wallpaper/project.json')
           data = json.loads(p.read_text(encoding='utf-8'))
           data.pop('workshopid', None)
@@ -158,7 +154,6 @@ The complete corresponding source code is available in this repository. Downstre
 ''', encoding='utf-8')
           PY
 
-          # The bootstrap workflow must not remain in the finished repository.
           rm -rf .github
 
       - name: Commit standalone snapshot
