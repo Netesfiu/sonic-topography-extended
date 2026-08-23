@@ -1,25 +1,25 @@
-name: Build and release Wallpaper Engine package
+name: Build and Release
 
 on:
   push:
     branches:
       - main
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
-  issues:
-    types:
-      - opened
 
 permissions:
   contents: write
-  issues: write
 
 jobs:
-  build-release:
-    if: github.event_name != 'issues' || github.event.issue.title == 'build-release-v1'
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out repository
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Set up pnpm
@@ -47,41 +47,23 @@ jobs:
           test -f dist-wallpaper/project.json
           test -f dist-wallpaper/preview.gif
 
-      - name: Package release archive
+      - name: Create release archive
         shell: bash
         run: |
-          cd dist-wallpaper
-          zip -r ../sonic-topography-extended-wallpaper.zip .
-          cd ..
-          sha256sum sonic-topography-extended-wallpaper.zip > sonic-topography-extended-wallpaper.zip.sha256
+          archive="sonic-topography-extended-${GITHUB_REF_NAME}.zip"
+          (cd dist-wallpaper && zip -r "../${archive}" .)
+          echo "RELEASE_ARCHIVE=${archive}" >> "$GITHUB_ENV"
 
-      - name: Publish rolling latest release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        shell: bash
-        run: |
-          git tag -f latest "${GITHUB_SHA}"
-          git push origin refs/tags/latest --force
+      - name: Upload CI artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sonic-topography-extended-${{ github.sha }}
+          path: dist-wallpaper/
+          if-no-files-found: error
 
-          if gh release view latest >/dev/null 2>&1; then
-            gh release edit latest \
-              --title "Sonic Topography Extended - latest" \
-              --notes "Automated Wallpaper Engine build from main at ${GITHUB_SHA}."
-          else
-            gh release create latest \
-              --title "Sonic Topography Extended - latest" \
-              --notes "Automated Wallpaper Engine build from main at ${GITHUB_SHA}." \
-              --prerelease
-          fi
-
-          gh release upload latest \
-            sonic-topography-extended-wallpaper.zip \
-            sonic-topography-extended-wallpaper.zip.sha256 \
-            --clobber
-
-      - name: Close manual build issue
-        if: github.event_name == 'issues'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        shell: bash
-        run: gh issue close "${{ github.event.issue.number }}" --reason completed
+      - name: Publish GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ env.RELEASE_ARCHIVE }}
+          generate_release_notes: true
