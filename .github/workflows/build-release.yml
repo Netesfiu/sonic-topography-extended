@@ -50,7 +50,8 @@ jobs:
       - name: Create release archive
         shell: bash
         run: |
-          archive="sonic-topography-extended-${GITHUB_REF_NAME}.zip"
+          ref_name="${GITHUB_REF_NAME//\//-}"
+          archive="sonic-topography-extended-${ref_name}.zip"
           (cd dist-wallpaper && zip -r "../${archive}" .)
           echo "RELEASE_ARCHIVE=${archive}" >> "$GITHUB_ENV"
 
